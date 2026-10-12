@@ -75,10 +75,6 @@
     "anthropic-messages",
     "messages-api"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/aaronlei/dsh-web-search-diy.git"
-  },
   "engines": {
     "node": ">=18"
   }

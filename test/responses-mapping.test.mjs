@@ -96,6 +96,23 @@ describe("mapResponsesResponse: web_search_call.results[] fallback metadata", ()
 		});
 		assert.deepEqual(result.sources, [{ url: "https://q.example/" }]);
 	});
+
+	it("preserves a direct answer when the gateway skips the search tool", () => {
+		assert.deepEqual(mapResponsesResponse({
+			output: [{ type: "message", content: [{ type: "output_text", text: "网关直接回答" }] }]
+		}), { content: "网关直接回答", sources: [], truncated: false });
+	});
+
+	it("preserves citation-only sources without a search-call block", () => {
+		assert.deepEqual(mapResponsesResponse({
+			output: [{ type: "message", content: [{ type: "output_text", text: "有引用", annotations: [{ type: "url_citation", url: "https://cite.example/", title: "引用来源" }] }] }]
+		}), { content: "有引用", sources: [{ url: "https://cite.example/", title: "引用来源" }], truncated: false });
+	});
+
+	it("errors only when there is no call, citation, or answer text", () => {
+		assert.throws(() => mapResponsesResponse({ output: [] }), /empty response without a search call, citations, or answer text/);
+		assert.doesNotThrow(() => mapResponsesResponse({ output: [{ type: "web_search_call", action: { sources: [] } }] }));
+	});
 });
 
 describe("zhipu paas/v4 request bodies", () => {
